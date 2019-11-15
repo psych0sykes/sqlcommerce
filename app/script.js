@@ -32,7 +32,6 @@ con.connect(function(err) {
     if (err) throw err;
     products = result;
     getItems(result)
-    cb()
   });
 });
 };
@@ -51,17 +50,13 @@ let customerChoice = inquirer.prompt([
       What would you like to buy?
       `
     }
-  ]).then(function(item) {
-    console.log(item);
-    return(item);
+  ]).then(function(x) {
+    console.log(products[x.item]);
   });
 };
 
 
 // =============================== RUN PROGRAM ================================= >
 
-function runProgram(){
-  whatToBuy()
-};
 
-getProducts(runProgram());
+getProducts(whatToBuy());
