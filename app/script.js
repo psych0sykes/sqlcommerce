@@ -36,7 +36,6 @@ function getProducts(cb){
 function getInventory (id,qty,cb){
     con.query("SELECT * FROM products WHERE id = ?", [id], function (err, result) {
       if (err) throw err;
-      console.log(result)
       cb(result[0],qty);
     })
 };
@@ -79,7 +78,6 @@ let customerChoice = inquirer.prompt([
       let newQty = item.inventory_qty - qty;
 
     console.log("Checking inventory..... " + item.item_name);
-    console.log("===========DEV========== QTY: " + newQty);
     console.log("");
       if(newQty > 0) {
         console.log("Purchase Complete!")
@@ -88,9 +86,12 @@ let customerChoice = inquirer.prompt([
       else{
         console.log("Insufficient Qty for Order...")
       }
+      console.log("...");
+      console.log("");
+      console.log("");
+      console.log("");
 
-
-
+      runProgram();
     });
 
   });
