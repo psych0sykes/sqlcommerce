@@ -26,37 +26,88 @@ function getItems (array) {
 
 // Get all products and assign to variable.
 function getProducts(cb){
-con.connect(function(err) {
-  if (err) throw err;
   con.query("SELECT * FROM products", function (err, result) {
     if (err) throw err;
     products = result;
     getItems(result)
   });
-});
 };
+
+function getInventory (id,qty,cb){
+    con.query("SELECT * FROM products WHERE id = ?", [id], function (err, result) {
+      if (err) throw err;
+      console.log(result)
+      cb(result[0],qty);
+    })
+};
+
+function updateProducts (id,col,value){
+  con.query("UPDATE products SET ?? = ? WHERE id = ?", [col,value,id], function (err, result){
+    if (err) throw err;
+  });
+}
 
 
 // ============================ INQUIRER FUNCTIONS =============================>
 function whatToBuy(){
+  console.log("     ~crunchy store~")
 let customerChoice = inquirer.prompt([
 
     {
       type: "input",
       name: "item",
-      message:
-      `
-           ~crunchy store~
-      What would you like to buy?
-      `
+      message:"What would you like to buy?"
+    },
+    {
+      type: "input",
+      name: "qty",
+      message: "How many would you like to buy?"
     }
   ]).then(function(x) {
-    console.log(products[x.item]);
+    let id = x.item;
+    let qty = x.qty;
+
+    console.log("Item: " + products[x.item].item_name);
+    console.log("QTY: " + x.qty);
+    console.log("Total Price: $" + (products[x.item].sales_price * x.qty))
+
+    // CHECK INVENTORY
+
+    getInventory(id,qty,function(item,qty){
+    
+    // IF STATEMENT
+      let newQty = item.inventory_qty - qty;
+
+    console.log("Checking inventory..... " + item.item_name);
+    console.log("===========DEV========== QTY: " + newQty);
+    console.log("");
+      if(newQty > 0) {
+        console.log("Purchase Complete!")
+        updateProducts(id,"inventory_qty",newQty);
+      }
+      else{
+        console.log("Insufficient Qty for Order...")
+      }
+
+
+
+    });
+
   });
 };
 
 
 // =============================== RUN PROGRAM ================================= >
+function runProgram(){
+whatToBuy();
+getProducts();
+};                                
 
+function connect() {
+con.connect(function(err) {
+if (err) throw err;
+runProgram();
+});
+};
 
-getProducts(whatToBuy());
+connect();
